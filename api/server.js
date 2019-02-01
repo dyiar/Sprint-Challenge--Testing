@@ -8,7 +8,7 @@ server.get("/", (req, res) => {
   res.status(200).json({ sanity: "check" });
 });
 
-server.post("/", (req, res) => {
+server.post("/games", (req, res) => {
   if (req.body.title == null || req.body.genre == null) {
     res.status(422).send({ error: "information incomplete " });
   } else {
@@ -27,5 +27,12 @@ server.post("/", (req, res) => {
       .catch(() => res.status(500).send({ error: "data not saved" }));
   }
 });
+
+server.get('/games', (req, res) => {
+    db('games').then(game => {
+        res.status(200).send(game)
+    })
+    .catch(() => res.status(500).json({ error: 'cant get games'}))
+})
 
 module.exports = server;
