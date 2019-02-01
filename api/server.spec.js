@@ -38,6 +38,17 @@ describe("server.js tests", () => {
 
       expect(response.type).toMatch(/json/i);
     });
+
+    it('should not let duplicate titles post', async () => {
+        let league = await request(server)
+        .post("/games")
+        .send({ title: "League of Legends", genre: "MOBA", releaseYear: 2010 });
+        let legends = await request(server)
+        .post("/games")
+        .send({ title: "League of Legends", genre: "MOBA", releaseYear: 2010 });
+
+        expect(legends.status).toBe(405)
+    })
   });
 
   describe("GET /GAMES endpoint", () => {
@@ -65,4 +76,22 @@ describe("server.js tests", () => {
       expect(response.text).toEqual('[]');
     });
   });
+
+  describe('GET /GAMES/:ID endpoint', () => {
+      it('should get the game at the ID', async () => {
+          let dota = await request(server)
+          .post("/games")
+          .send({ title: "DOTA", genre: "MOBA" })
+          let response = await request(server).get('/games')
+
+          expect(dota).toBe(1);
+          expect(response.id).toBe(1)
+      })
+
+      it('should send back 404 if ID doesnt exist', async () => {
+          let response = await request(server).get('/games/4')
+          expect(response.status).toBe(404)
+      })
+  })
+
 });
